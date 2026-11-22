@@ -10,8 +10,11 @@ workflows:
 
       - name: Prepare App and Assets
         script: |
-          # Unzip the original macOS zip directly from your repo
-          unzip -q "BP-REBOOTED macOS edition by SoultheHopper.zip" -d ./app_extracted
+          # Paste your Discord CDN link for "BP-REBOOTED macOS edition by SoultheHopper.zip" below
+          curl -f -L -o "BPRE_macOS.zip" "PASTE_YOUR_DISCORD_LINK_HERE"
+          
+          # Unzip the macOS app
+          unzip -q "BPRE_macOS.zip" -d ./app_extracted
           
           # Find the .app at any depth while ignoring __MACOSX
           APP_PATH=$(find ./app_extracted -not -path "*/__MACOSX/*" -name "*.app" -type d | head -n 1)
@@ -19,6 +22,7 @@ workflows:
           
           mkdir -p ./dmg_source
           cp -R "$APP_PATH" ./dmg_source/
+          ls -la ./dmg_source
 
           # Ensure executable permissions
           chmod +x ./dmg_source/*.app/Contents/MacOS/*
