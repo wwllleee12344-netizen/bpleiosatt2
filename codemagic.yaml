@@ -13,8 +13,10 @@ workflows:
           # Unzip the original macOS zip directly from your repo
           unzip -q "BP-REBOOTED macOS edition by SoultheHopper.zip" -d ./app_extracted
           
-          # Grab the real .app and skip the hidden __MACOSX folder
-          APP_PATH=$(find ./app_extracted -path "*/__MACOSX" -prune -o -name "*.app" -maxdepth 2 -print | head -n 1)
+          # Find the .app at any depth while ignoring __MACOSX
+          APP_PATH=$(find ./app_extracted -not -path "*/__MACOSX/*" -name "*.app" -type d | head -n 1)
+          echo "Found app at: $APP_PATH"
+          
           mkdir -p ./dmg_source
           cp -R "$APP_PATH" ./dmg_source/
 
@@ -42,8 +44,9 @@ workflows:
       - name: Package BPRE.dmg
         script: |
           mkdir -p output
-          APP_FULL_PATH=$(find ./dmg_source -name "*.app" -maxdepth 1 | head -n 1)
+          APP_FULL_PATH=$(find ./dmg_source -mindepth 1 -maxdepth 1 -name "*.app" | head -n 1)
           APP_NAME=$(basename "$APP_FULL_PATH")
+          echo "Packaging app: $APP_NAME"
 
           open -a Finder
           sleep 2
