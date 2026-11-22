@@ -10,15 +10,17 @@ workflows:
 
       - name: Prepare App and Assets
         script: |
+          set -e
           # Paste your Discord CDN link for "BP-REBOOTED macOS edition by SoultheHopper.zip" below
           curl -f -L -o "BPRE_macOS.zip" "PASTE_YOUR_DISCORD_LINK_HERE"
           
           # Unzip the macOS app
           unzip -q "BPRE_macOS.zip" -d ./app_extracted
           
-          # Find the .app at any depth while ignoring __MACOSX
+          # Find the .app while ignoring __MACOSX
           APP_PATH=$(find ./app_extracted -not -path "*/__MACOSX/*" -name "*.app" -type d | head -n 1)
           echo "Found app at: $APP_PATH"
+          test -n "$APP_PATH"
           
           mkdir -p ./dmg_source
           cp -R "$APP_PATH" ./dmg_source/
@@ -47,10 +49,16 @@ workflows:
 
       - name: Package BPRE.dmg
         script: |
+          set -e
           mkdir -p output
-          APP_FULL_PATH=$(find ./dmg_source -mindepth 1 -maxdepth 1 -name "*.app" | head -n 1)
-          APP_NAME=$(basename "$APP_FULL_PATH")
+          
+          APP_NAME=""
+          for app in ./dmg_source/*.app; do
+            APP_NAME=$(basename "$app")
+            break
+          done
           echo "Packaging app: $APP_NAME"
+          test -n "$APP_NAME"
 
           open -a Finder
           sleep 2
