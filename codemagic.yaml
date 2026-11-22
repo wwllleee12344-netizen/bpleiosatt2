@@ -43,8 +43,11 @@ workflows:
           sips -z 1024 1024 "BPRE disk dmg.png" --out icon.iconset/icon_512x512@2x.png
           iconutil -c icns icon.iconset
 
-          # Keep exact 660x400 size and set 72 DPI metadata
-          cp "Innovation_Background_IL2CPP_Recomp_Empty_Background.png" "bg_final.png"
+          # Automatically locate your background PNG anywhere in the repo
+          BG_FILE=$(find . -maxdepth 3 -not -path "./app_extracted/*" -not -path "./icon.iconset/*" -iname "*Background*.png" | head -n 1)
+          echo "Found background at: $BG_FILE"
+          test -n "$BG_FILE"
+          cp "$BG_FILE" "bg_final.png"
           sips -s dpiWidth 72 -s dpiHeight 72 "bg_final.png"
 
       - name: Package BPRE.dmg
