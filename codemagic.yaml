@@ -70,9 +70,9 @@ workflows:
             --window-pos 200 120 \
             --window-size 660 434 \
             --icon-size 100 \
-            --icon "$APP_NAME" 180 225 \
+            --icon "$APP_NAME" 180 245 \
             --hide-extension "$APP_NAME" \
-            --app-drop-link 480 225 \
+            --app-drop-link 480 245 \
             --no-internet-enable \
             "output/BP-REBOOTED.dmg" \
             "./dmg_source/"
