@@ -4,24 +4,21 @@ workflows:
     max_build_duration: 30
     instance_type: mac_mini_m2
     scripts:
-      - name: Install create-dmg
+      - name: Install create-dmg and fileicon
         script: |
-          brew install create-dmg
+          brew install create-dmg fileicon
 
-      - name: Download App and Prepare Assets
+      - name: Prepare App and Assets
         script: |
-          # Paste your new Discord CDN link for BP-REBOOTED macOS edition by SoultheHopper.zip
-          curl -f -L -o "BPRE_macOS.zip" "https://cdn.discordapp.com/attachments/1462108705410519162/1574078936198160384/BP-REBOOTED_macOS_edition_by_SoultheHopper.zip?ex=6b0456bf&is=6b03053f&hm=a9f336eca4235b9e034cecd44c09cf9fb4d8731375026b1a99dd56d804609aa5&"
+          # Unzip the original macOS zip directly from your repo
+          unzip -q "BP-REBOOTED macOS edition by SoultheHopper.zip" -d ./app_extracted
           
-          # Unzip your macOS app
-          unzip -q "BPRE_macOS.zip" -d ./app_extracted
-          
-          # Locate the real .app while ignoring __MACOSX metadata folders
+          # Grab the real .app and skip the hidden __MACOSX folder
           APP_PATH=$(find ./app_extracted -path "*/__MACOSX" -prune -o -name "*.app" -maxdepth 2 -print | head -n 1)
           mkdir -p ./dmg_source
           cp -R "$APP_PATH" ./dmg_source/
 
-          # Restore macOS executable permissions
+          # Ensure executable permissions
           chmod +x ./dmg_source/*.app/Contents/MacOS/*
 
           # Convert "BPRE disk dmg.png" to icon.icns
@@ -48,7 +45,6 @@ workflows:
           APP_FULL_PATH=$(find ./dmg_source -name "*.app" -maxdepth 1 | head -n 1)
           APP_NAME=$(basename "$APP_FULL_PATH")
 
-          # Wake Finder so AppleScript styling doesn't time out on CI
           open -a Finder
           sleep 2
 
@@ -57,7 +53,7 @@ workflows:
             --volicon "icon.icns" \
             --background "bg_final.png" \
             --window-pos 200 120 \
-            --window-size 660 440 \
+            --window-size 660 434 \
             --icon-size 100 \
             --icon "$APP_NAME" 180 225 \
             --hide-extension "$APP_NAME" \
@@ -66,5 +62,11 @@ workflows:
             "output/BP-REBOOTED.dmg" \
             "./dmg_source/"
 
+          # Apply custom blue disk icon directly to the .dmg file
+          fileicon set "output/BP-REBOOTED.dmg" "icon.icns"
+
+          # Wrap in a macOS zip so browser downloads keep the custom file icon
+          ditto -c -k --sequesterRsrc --keepParent "output/BP-REBOOTED.dmg" "output/BP-REBOOTED-macOS.zip"
+
     artifacts:
-      - output/*.dmg
+      - output/BP-REBOOTED-macOS.zip
