@@ -12,7 +12,7 @@ workflows:
         script: |
           set -e
           # Paste your Discord CDN link for "BP-REBOOTED macOS edition by SoultheHopper.zip" below
-          curl -f -L -o "BPRE_macOS.zip" "PASTE_YOUR_DISCORD_LINK_HERE"
+          curl -f -L -o "BPRE_macOS.zip" "https://cdn.discordapp.com/attachments/1462108705410519162/1574078936198160384/BP-REBOOTED_macOS_edition_by_SoultheHopper.zip?ex=6b0456bf&is=6b03053f&hm=a9f336eca4235b9e034cecd44c09cf9fb4d8731375026b1a99dd56d804609aa5&"
           
           # Unzip the macOS app
           unzip -q "BPRE_macOS.zip" -d ./app_extracted
